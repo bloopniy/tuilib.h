@@ -1,37 +1,71 @@
 #ifndef TUILIB_H
 #define TUILIB_H
 
+#include <stdbool.h>
+
+#ifndef TUILIB_DEF
+#	define TUILIB_DEF
+#endif // TUILIB_DEF
+
 typedef struct {
 	int code;
 } Tui_Color16;
 
-#define TUI_BLACK_FG   (TuiColor) { 30 }
-#define TUI_RED_FG     (TuiColor) { 31 }
-#define TUI_GREEN_FG   (TuiColor) { 32 }
-#define TUI_YELLOW_FG  (TuiColor) { 33 }
-#define TUI_BLUE_FG    (TuiColor) { 34 }
-#define TUI_MAGENTA_FG (TuiColor) { 35 }
-#define TUI_CYAN_FG    (TuiColor) { 36 }
-#define TUI_WHITE_FG   (TuiColor) { 37 }
-#define TUI_BLACK_BG   (TuiColor) { 40 }
-#define TUI_RED_BG     (TuiColor) { 41 }
-#define TUI_GREEN_BG   (TuiColor) { 42 }
-#define TUI_YELLOW_BG  (TuiColor) { 43 }
-#define TUI_BLUE_BG    (TuiColor) { 44 }
-#define TUI_MAGENTA_BG (TuiColor) { 45 }
-#define TUI_CYAN_BG    (TuiColor) { 46 }
-#define TUI_WHITE_BG   (TuiColor) { 47 }
+#define TUI_BLACK_FG   (Tui_Color16) { 30 }
+#define TUI_RED_FG     (Tui_Color16) { 31 }
+#define TUI_GREEN_FG   (Tui_Color16) { 32 }
+#define TUI_YELLOW_FG  (Tui_Color16) { 33 }
+#define TUI_BLUE_FG    (Tui_Color16) { 34 }
+#define TUI_MAGENTA_FG (Tui_Color16) { 35 }
+#define TUI_CYAN_FG    (Tui_Color16) { 36 }
+#define TUI_WHITE_FG   (Tui_Color16) { 37 }
+#define TUI_BLACK_BG   (Tui_Color16) { 40 }
+#define TUI_RED_BG     (Tui_Color16) { 41 }
+#define TUI_GREEN_BG   (Tui_Color16) { 42 }
+#define TUI_YELLOW_BG  (Tui_Color16) { 43 }
+#define TUI_BLUE_BG    (Tui_Color16) { 44 }
+#define TUI_MAGENTA_BG (Tui_Color16) { 45 }
+#define TUI_CYAN_BG    (Tui_Color16) { 46 }
+#define TUI_WHITE_BG   (Tui_Color16) { 47 }
 
-void tui_init_terminal(void);
-void tui_close_terminal(void);
+TUILIB_DEF void tui_init_terminal(void);
+TUILIB_DEF void tui_close_terminal(void);
 
-bool tui_should_exit(void);
-void tui_begin_drawing(void);
-void tui_end_drawing(void);
+TUILIB_DEF bool tui_should_exit(void);
+TUILIB_DEF void tui_begin_drawing(void);
+TUILIB_DEF void tui_end_drawing(void);
 
-void tui_clear_background(Tui_Color16 color);
+TUILIB_DEF void tui_clear_background(Tui_Color16 color);
 
-#ifdef TUI_NAMESPACE
+
+#ifdef TUILIB_IMPLEMENTATION
+
+TUILIB_DEF void tui_init_terminal(void) {
+
+}
+
+TUILIB_DEF void tui_close_terminal(void) {
+}
+
+TUILIB_DEF bool tui_should_exit(void) {
+	return false;
+}
+
+TUILIB_DEF void tui_begin_drawing(void) {
+
+}
+
+TUILIB_DEF void tui_end_drawing(void) {
+
+}
+
+TUILIB_DEF void tui_clear_background(Tui_Color16 color) {
+
+}
+
+#endif //TUILIB_IMPLEMENTATION
+
+#ifdef TUILIB_NAMESPACE
 	#define Color16 Tui_Color16;
 	
 	#define BLACK_FG        TUI_BLACK_FG
@@ -61,4 +95,3 @@ void tui_clear_background(Tui_Color16 color);
 	#define clear_background tui_clear_background
 #endif // TUI_NAMESPACE
 #endif // TUILIB_H
-
