@@ -2,6 +2,11 @@
 #define TUILIB_H
 
 #include <stdbool.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #ifndef TUILIB_DEF
 #	define TUILIB_DEF
@@ -10,6 +15,12 @@
 typedef struct {
 	int code;
 } Tui_Color16;
+
+typedef struct {
+	char content;
+	Tui_Color16 color;
+} Cell;
+
 
 #define TUI_BLACK_FG   (Tui_Color16) { 30 }
 #define TUI_RED_FG     (Tui_Color16) { 31 }
@@ -37,26 +48,46 @@ TUILIB_DEF void tui_end_drawing(void);
 
 TUILIB_DEF void tui_clear_background(Tui_Color16 color);
 
+typedef struct {
+	struct {
+		int width;
+		int height;
+		char* content;
+	} term;
+} Tui_Terminal_State;
+
+TUILIB_DEF extern Tui_Terminal_State TUILIB_TERMINAL;
 
 #ifdef TUILIB_IMPLEMENTATION
 
-TUILIB_DEF void tui_init_terminal(void) {
+Tui_Terminal_State TUILIB_TERMINAL = {0};
 
+TUILIB_DEF void tui_init_terminal(void) {
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	TUILIB_TERMINAL.term.width  = w.ws_col;
+	TUILIB_TERMINAL.term.height = w.ws_row;
+	TUILIB_TERMINAL.term.content = calloc((size_t)TUILIB_TERMINAL.term.width * TUILIB_TERMINAL.term.height, 1);
 }
 
 TUILIB_DEF void tui_close_terminal(void) {
+
 }
 
 TUILIB_DEF bool tui_should_exit(void) {
 	return false;
-}
+} 
 
 TUILIB_DEF void tui_begin_drawing(void) {
 
 }
 
 TUILIB_DEF void tui_end_drawing(void) {
-
+	for (int y = 0; y < TUILIB_TERMINAL.term.height; ++y) {
+		for (int x = 0; x < TUILIB_TERMINAL.term.height; ++x) {
+			printf("%c", TUILIB_TERMINAL.term.content[y * TUILIB_TERMINAL.term.width + x]);
+		}
+	}
 }
 
 TUILIB_DEF void tui_clear_background(Tui_Color16 color) {
@@ -66,7 +97,7 @@ TUILIB_DEF void tui_clear_background(Tui_Color16 color) {
 #endif //TUILIB_IMPLEMENTATION
 
 #ifdef TUILIB_NAMESPACE
-	#define Color16 Tui_Color16;
+	#define Color16 Tui_Color16
 	
 	#define BLACK_FG        TUI_BLACK_FG
 	#define RED_FG          TUI_RED_FG    
