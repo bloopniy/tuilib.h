@@ -28,6 +28,7 @@ typedef struct {
 } Tui_Cell;
 
 
+#define TUI_CLEAR_COLOR (Tui_Color16) { 0 }
 #define TUI_BLACK_FG   (Tui_Color16) { 30 }
 #define TUI_RED_FG     (Tui_Color16) { 31 }
 #define TUI_GREEN_FG   (Tui_Color16) { 32 }
@@ -66,6 +67,7 @@ typedef struct {
 		int height;
 		Tui_Cell* content;
 	} term;
+
 } Tui_Terminal_State;
 
 TUILIB_DEF extern Tui_Terminal_State TUILIB_TERMINAL;
@@ -86,7 +88,7 @@ TUILIB_DEF void tui_init_terminal(void) {
 }
 
 TUILIB_DEF void tui_close_terminal(void) {
-
+	printf("\033[?1049l");
 }
 
 TUILIB_DEF int  tui_get_term_width(void) {
@@ -102,12 +104,17 @@ TUILIB_DEF bool tui_should_exit(void) {
 } 
 
 TUILIB_DEF void tui_begin_drawing(void) {
+	for (int i = 0; i < tui_get_term_height() * tui_get_term_width(); ++i) {
+		TUILIB_TERMINAL.term.content[i].content = ' ';
+	}
 
+	printf("\033[?1049h");
+	printf("\033[?25l");
 }
 
 TUILIB_DEF void tui_end_drawing(void) {
-	for (int y = 0; y < tui_get_term_width(); ++y) {
-		for (int x = 0; x < tui_get_term_height(); ++x) {
+	for (int y = 0; y < tui_get_term_height(); ++y) {
+		for (int x = 0; x < tui_get_term_width(); ++x) {
 			Tui_Cell cell = TUILIB_TERMINAL.term.content[y * tui_get_term_width() + x];
 			printf("\033[%im\033[%im%c\033[0m", cell.fg.code, cell.bg.code, cell.content);
 		}
@@ -115,8 +122,18 @@ TUILIB_DEF void tui_end_drawing(void) {
 	}
 }
 
-TUILIB_DEF void tui_draw_pixel(char content, int x, int y) {}
-TUILIB_DEF void tui_draw_pixel_v(char content, Tui_Vector2 coords) {}
+TUILIB_DEF void tui_draw_pixel(char content, int x, int y) {
+	TUILIB_TERMINAL.term.content[y * tui_get_term_width() + x] = (Tui_Cell){
+		.content = content,
+		.fg = TUI_CLEAR_COLOR,
+		.bg = TUI_CLEAR_COLOR,
+	};
+}
+
+TUILIB_DEF void tui_draw_pixel_v(char content, Tui_Vector2 coords) {
+	tui_draw_pixel(content, coords.x, coords.y);
+}
+
 TUILIB_DEF void tui_draw_pixel_cv(Tui_Cell cell, Tui_Vector2 coords) {
 	TUILIB_TERMINAL.term.content[coords.y * tui_get_term_width() + coords.x] = cell;
 }
